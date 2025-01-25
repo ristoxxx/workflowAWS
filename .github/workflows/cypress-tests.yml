@@ -13,31 +13,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out the repository code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Navigate to the frontend folder
+      - name: Set working directory
+        run: cd frontend
+
+      # Step 3: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: npm install
+        working-directory: ./frontend
 
+      # Step 5: Start the React app
       - name: Start React App
         run: npm start &
         env:
           CI: true
+        working-directory: ./frontend
 
+      # Step 6: Wait for the app to be ready
       - name: Wait for React App
         run: npx wait-on http://localhost:3000
+        working-directory: ./frontend
 
+      # Step 7: Run Cypress tests
       - name: Run Cypress tests
         run: npx cypress run
+        working-directory: ./frontend
 
+      # Step 8: Upload Failure Screenshots
       - name: Upload Failure Screenshots
         if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: ./frontend/cypress/screenshots
